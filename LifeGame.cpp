@@ -28,7 +28,7 @@ enum vector {
 int vectors[][2] = {
 	{0, -1},  // VECTOR_UP
 	{0, 1},  // VECTOR_DOWN
-    {-1, 0},  // VECTOR_LEFT
+        {-1, 0},  // VECTOR_LEFT
 	{1, 0},  // VECTOR_RIGHT
 	{-1, -1},  // VECTOR_UP_LEFT
 	{1, -1},  // VECTOR_UP_RIGHT
@@ -43,7 +43,7 @@ int cells[FIELD_HEIGHT][FIELD_WIDTH];
 int _cells[FIELD_HEIGHT][FIELD_WIDTH];
 
 // カーソルの定義
-int cursorX = 50, cursorY = 23;
+int cursorX = FIELD_WIDTH / 2, cursorY = FIELD_HEIGHT / 2;
 
 // 最初に盤面のセットアップ
 void setup(void) {
