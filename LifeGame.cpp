@@ -43,7 +43,7 @@ int cells[FIELD_HEIGHT][FIELD_WIDTH];
 int _cells[FIELD_HEIGHT][FIELD_WIDTH];
 
 // カーソルの定義
-int cursorX = 50, cursorY = 23;
+int cursorX = FIELD_WIDTH / 2, cursorY = FIELD_HEIGHT / 2;
 
 // 最初に盤面のセットアップ
 void setup(void) {
@@ -130,9 +130,9 @@ int livesAlong(int _x, int _y) {
 	return count;
 }
 
-// 次に生きているか(_alivesは周りの生きているセルの数, _cellは今のセルが生きているか死んでいるか)
-bool nextAlive(int _alives, int _cell) {
-	if (_cell == CELL_ALIVE) {
+// 次に生きているか(_alivesは周りの生きているセルの数, *cellは今のセルが生きているか死んでいるか)
+bool nextAlive(int _alives, int *cell) {
+	if (*cell == CELL_ALIVE) {
 		switch (_alives) {
 		case 1: return false; break;
 		case 2: return true; break;
@@ -141,7 +141,7 @@ bool nextAlive(int _alives, int _cell) {
 		}
 	}
 
-	if (_cell == CELL_DEAD) {
+	if (*cell == CELL_DEAD) {
 		if (_alives == 3) {
 			return true;
 		}
@@ -152,6 +152,29 @@ bool nextAlive(int _alives, int _cell) {
 	}
 
 	return false;
+}
+
+void nextGen(int value) {
+	if(value != 0) {
+		for (int y = 0; y < FIELD_HEIGHT; y++) {
+			for (int x = 0; x < FIELD_WIDTH; x++) {
+				_cells[y][x] = cells[y][x];
+			}
+		}
+
+		for (int y = 0; y < FIELD_HEIGHT; y++) {
+			for (int x = 0; x < FIELD_WIDTH; x++) {
+				if (nextAlive(livesAlong(x, y), &cells[y][x])) {
+					cells[y][x] = CELL_ALIVE;
+				}
+
+				else {
+					cells[y][x] = CELL_DEAD;
+				}
+			}
+		}
+		nextGen(value - 1);
+	}
 }
 
 int main(void) {
@@ -200,26 +223,21 @@ int main(void) {
 		// rを押すと次の生死を判断(次の世代へ)
 		case 'r':
 			gen++;
-			for (int y = 0; y < FIELD_HEIGHT; y++) {
-				for (int x = 0; x < FIELD_WIDTH; x++) {
-					_cells[y][x] = cells[y][x];
-				}
-			}
-			for (int y = 0; y < FIELD_HEIGHT; y++) {
-				for (int x = 0; x < FIELD_WIDTH; x++) {
-					if (nextAlive(livesAlong(x, y), _cells[y][x])) {
-						cells[y][x] = CELL_ALIVE;
-					}
+			nextGen(1);
+			break;
 
-					else {
-						cells[y][x] = CELL_DEAD;
-					}
-				}
-			}
+		case 's':
+			char *input_line;
+			input_line = (char *)malloc(sizeof(char) * 100);
+			printf("何世代進めますか?:\n");
+			fgets(input_line, sizeof(input_line), stdin);
+			gen += (int)(*input_line);
+			nextGen((int)(*input_line));
+			free(input_line);
 			break;
 
 		// eでプログラムを終える
-		case 'e': _continue = false; break;
+		case 'e':_continue = false; break;
 		default: break;
 		}
 	}
